@@ -5,7 +5,7 @@
   "compatibility_date": "2025-11-03",
   "triggers": {
     "crons": [
-      "0 1 * * *"
+      "0 1 * * *" // 毎日午前1時 - ゴミ出し通知 (handlers/garbage-collection)
     ]
   }
 }

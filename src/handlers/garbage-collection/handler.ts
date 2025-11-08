@@ -1,3 +1,4 @@
+import { sendDiscordWebhook } from '../../utils/discord'
 import { garbageSchedule, garbageTypes } from './config'
 
 /**
@@ -35,9 +36,9 @@ export function getGarbageTypeForDate(date: Date): string | null {
 }
 
 /**
- * ゴミ出し通知をDiscord Webhookに送信する
+ * ゴミ出し通知をDiscord Webhookに送信するハンドラー
  */
-export async function sendGarbageNotification(webhookUrl: string): Promise<void> {
+export async function handleGarbageCollection(webhookUrl: string): Promise<void> {
   const today = new Date()
   const garbageTypeName = getGarbageTypeForDate(today)
 
@@ -59,7 +60,7 @@ export async function sendGarbageNotification(webhookUrl: string): Promise<void>
     embeds: [
       {
         title: '🗑️ ゴミ出しリマインダー',
-        description: `今日は **${garbageType.name}** の日です！`,
+        description: `今日は **${garbageType.name}** の日です!`,
         color: garbageType.color,
         footer: {
           text: 'ゴミ出しをお忘れなく'
@@ -68,18 +69,6 @@ export async function sendGarbageNotification(webhookUrl: string): Promise<void>
     ]
   }
 
-  // Discord Webhookにメッセージを送信
-  const response = await fetch(webhookUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Discord通知の送信に失敗しました: ${response.status} ${response.statusText}`)
-  }
-
-  console.log(`ゴミ出し通知を送信しました: ${garbageType}`)
+  await sendDiscordWebhook(webhookUrl, message)
+  console.log(`ゴミ出し通知を送信しました: ${garbageType.name}`)
 }

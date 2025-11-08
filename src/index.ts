@@ -1,14 +1,22 @@
 import { Hono } from 'hono'
-import { sendGarbageNotification } from './notification'
+import { handleGarbageCollection } from './handlers/garbage-collection'
 
-type Bindings = {
-  DISCORD_WEBHOOK_URL: string
-}
+const app = new Hono<{ Bindings: CloudflareBindings }>()
 
-const app = new Hono<{ Bindings: Bindings }>()
+/**
+ * Cron trigger ハンドラー
+ * 各cron式に対応する処理を振り分ける
+ */
+const scheduled: ExportedHandlerScheduledHandler<CloudflareBindings> = async (controller, env, ctx) => {
+  switch (controller.cron) {
+    case "0 1 * * *":  // 毎日午前1時 - ゴミ出し通知
+      ctx.waitUntil(handleGarbageCollection(env.DISCORD_WEBHOOK_URL))
+      break
 
-const scheduled: ExportedHandlerScheduledHandler<Bindings> = async (event, env, ctx) => {
-  ctx.waitUntil(sendGarbageNotification(env.DISCORD_WEBHOOK_URL))
+    default:
+      console.log(`未定義のcron trigger: ${controller.cron}`)
+      break
+  }
 }
 
 export default {

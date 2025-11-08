@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "predeploy": "wrangler secret bulk .dev.vars",
+    "set-secrets": "wrangler secret bulk .dev.vars",
     "deploy": "wrangler deploy --minify --env production",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "test": "vitest run",
