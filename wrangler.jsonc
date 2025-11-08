@@ -7,5 +7,5 @@
     "crons": [
       "0 1 * * *" // 毎日午前1時 - ゴミ出し通知 (handlers/garbage-collection)
     ]
-  }
+  },"env": {"production":{"name":"discord-webhooks"}}
 }
