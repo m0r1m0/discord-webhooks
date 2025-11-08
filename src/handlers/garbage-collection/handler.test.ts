@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { getWeekOfMonth, getGarbageTypeForDate, sendGarbageNotification } from './notification'
+import { getWeekOfMonth, getGarbageTypeForDate, handleGarbageCollection } from './handler'
 
 describe('getWeekOfMonth', () => {
   it('月の第1週を正しく計算する', () => {
@@ -107,7 +107,7 @@ describe('getGarbageTypeForDate', () => {
   })
 })
 
-describe('sendGarbageNotification', () => {
+describe('handleGarbageCollection', () => {
   const mockWebhookUrl = 'https://discord.com/api/webhooks/test'
 
   beforeEach(() => {
@@ -133,7 +133,7 @@ describe('sendGarbageNotification', () => {
       statusText: 'OK',
     } as Response)
 
-    await sendGarbageNotification(mockWebhookUrl)
+    await handleGarbageCollection(mockWebhookUrl)
 
     expect(mockFetch).toHaveBeenCalledWith(
       mockWebhookUrl,
@@ -164,7 +164,7 @@ describe('sendGarbageNotification', () => {
       statusText: 'OK',
     } as Response)
 
-    await sendGarbageNotification(mockWebhookUrl)
+    await handleGarbageCollection(mockWebhookUrl)
 
     const callArgs = mockFetch.mock.calls[0]
     const body = JSON.parse(callArgs[1].body)
@@ -185,7 +185,7 @@ describe('sendGarbageNotification', () => {
       statusText: 'OK',
     } as Response)
 
-    await sendGarbageNotification(mockWebhookUrl)
+    await handleGarbageCollection(mockWebhookUrl)
 
     const callArgs = mockFetch.mock.calls[0]
     const body = JSON.parse(callArgs[1].body)
@@ -201,7 +201,7 @@ describe('sendGarbageNotification', () => {
 
     const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>
 
-    await sendGarbageNotification(mockWebhookUrl)
+    await handleGarbageCollection(mockWebhookUrl)
 
     expect(mockFetch).not.toHaveBeenCalled()
     expect(console.log).toHaveBeenCalledWith(
@@ -222,7 +222,7 @@ describe('sendGarbageNotification', () => {
       statusText: 'Internal Server Error',
     } as Response)
 
-    await expect(sendGarbageNotification(mockWebhookUrl)).rejects.toThrow(
+    await expect(handleGarbageCollection(mockWebhookUrl)).rejects.toThrow(
       'Discord通知の送信に失敗しました: 500 Internal Server Error'
     )
 
